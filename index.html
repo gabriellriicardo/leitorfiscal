@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nota Fiscal - Upload e Busca</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Upload Nota Fiscal XML</h1>
+        <form action="processar.php" method="post" enctype="multipart/form-data">
+            <label for="xmlfile">Selecione o arquivo XML:</label>
+            <input type="file" name="xmlfile" id="xmlfile" accept=".xml" required>
+            <input type="submit" value="Enviar">
+        </form>
+
+        <div id="nf-info">
+            <h2>Informações da Nota Fiscal</h2>
+            <p><strong>Emitente:</strong> <span id="emitente"></span></p>
+            <p><strong>Data e Hora de Emissão:</strong> <span id="dataEmissao"></span></p>
+        </div>
+
+        <div id="search-section">
+            <h2>Buscar Produtos</h2>
+            <input type="text" id="search-input" placeholder="Pesquise por nome ou preço...">
+        </div>
+
+        <div id="product-list-container">
+            <div id="product-list">
+                <!-- Os produtos aparecerão aqui após o upload -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
