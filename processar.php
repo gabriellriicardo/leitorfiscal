@@ -1,36 +1,33 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['xmlfile'])) {
-    if ($_FILES['xmlfile']['error'] === UPLOAD_ERR_OK) {
-        $fileTmpPath = $_FILES['xmlfile']['tmp_name'];
-        $xml = simplexml_load_file($fileTmpPath);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['xmlfile'])) {
+    $xmlFile = $_FILES['xmlfile']['tmp_name'];
 
-        if ($xml) {
-            $emitente = (string) $xml->NFe->infNFe->emit->xNome;
-            $dataEmissao = (string) $xml->NFe->infNFe->ide->dhEmi;
-            
-            $produtos = [];
-            foreach ($xml->NFe->infNFe->det as $produto) {
-                $item = [
-                    'nome' => (string) $produto->prod->xProd,
-                    'codigo_barras' => (string) $produto->prod->cEAN,
-                    'quantidade' => (float) $produto->prod->qCom,
-                    'preco' => (float) $produto->prod->vProd
-                ];
-                $produtos[] = $item;
-            }
-            
-            $response = [
-                'emitente' => $emitente,
-                'dataEmissao' => $dataEmissao,
-                'produtos' => $produtos
+    if (file_exists($xmlFile)) {
+        $xml = simplexml_load_file($xmlFile);
+
+        $emitente = (string)$xml->NFe->infNFe->emit->xNome;
+        $dataEmissao = (string)$xml->NFe->infNFe->ide->dhEmi;
+
+        $produtos = [];
+        foreach ($xml->NFe->infNFe->det as $produto) {
+            $produtos[] = [
+                'nome' => (string)$produto->prod->xProd,
+                'codigo_barras_comercial' => (string)$produto->prod->cEAN,
+                'codigo_barras_tributavel' => (string)$produto->prod->cEANTrib,
+                'quantidade' => (float)$produto->prod->qCom,
+                'valor_unitario' => (float)$produto->prod->vUnCom,
+                'preco' => (float)$produto->prod->vProd,
             ];
-            
-            echo json_encode($response);
-        } else {
-            echo json_encode(['error' => 'Erro ao processar o arquivo XML.']);
         }
+
+        echo json_encode([
+            'emitente' => $emitente,
+            'dataEmissao' => $dataEmissao,
+            'produtos' => $produtos,
+        ]);
     } else {
-        echo json_encode(['error' => 'Erro no upload do arquivo.']);
+        echo json_encode(['error' => 'Arquivo XML não encontrado.']);
     }
+} else {
+    echo json_encode(['error' => 'Nenhum arquivo enviado.']);
 }
-?>
